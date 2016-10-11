@@ -25,7 +25,6 @@ no warnings 'deprecated';
 
 use ParaDNS::Resolver;
 # note currently disabled as not everything works right
-use constant XS_AVAILABLE => eval { require ParaDNS::XS; };
 use constant NO_DNS => ($ENV{NODNS} || 0);
 
 my %RESOLVER;
@@ -48,15 +47,8 @@ sub get_resolver {
     if (INTERNAL_CACHE) {
         $cache_cleanup ||= Danga::Socket->AddTimer(CACHE_CLEAN_INTERVAL, \&_cache_cleanup);
     }
-    if (XS_AVAILABLE) {
-        return 1 if $RESOLVER{$$};
-        ParaDNS::XS::setup();
-        $RESOLVER{$$} = 1;
-    }
-    else {
-        my $servers = shift;
-        $RESOLVER{$$} ||= ParaDNS::Resolver->new($servers);
-    }
+    my $servers = shift;
+    $RESOLVER{$$} ||= ParaDNS::Resolver->new($servers);
 }
 
 sub _cache_cleanup {
@@ -129,31 +121,12 @@ sub new {
         }
         else {
             # not cached - do lookup
-            if (XS_AVAILABLE) {
-                my $callback = sub {
-                    $self->run_xs_callback(@_);
-                };
-                my $id;
-                if ($type eq "A" && $host =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/) {
-                    $id = ParaDNS::XS::dnsquery("PTR", "$4.$3.$2.$1.in-addr.arpa", $callback);
-                }
-                else {
-                    $id = ParaDNS::XS::dnsquery($type, $host, $callback);
-                }
-                if (!defined($id)) {
-                    # lookup failed for some bizarre reason - should never happen
-                    $client->continue_read() if $client;
-                    return;
-                }
-            }
-            else {
-                $cache{$type}{$host} = [];
-                if (!$resolver->query_type($self, $type, $host)) {
-                    # lookup failed for some bizarre reason - should never happen
-                    $client->continue_read() if $client;
-                    return;
-                }
-            }
+           $cache{$type}{$host} = [];
+           if (!$resolver->query_type($self, $type, $host)) {
+               # lookup failed for some bizarre reason - should never happen
+               $client->continue_read() if $client;
+               return;
+           }
         }
     }
 
@@ -200,54 +173,6 @@ my %type_to_host = (
     CNAME => 'dname',
 );
 
-sub run_xs_callback {
-    my ParaDNS $self = shift;
-    my $data = shift;
-#warn("$$ run_xs_callback status: $data->{status} => $data->{error}\n");
-    if ($data->{status} > 1) {
-        if ($data->{questions}) {
-#warn("$$ run_xs_callback $data->{error} with questions\n");
-            for my $q (@{$data->{questions}}) {
-                trace(2, "got $q->{question} => $data->{error}\n") if TRACE_LEVEL >= 2;
-                $self->{results}{$q->{question}} = $data->{error};
-                $self->{callback}->($data->{error}, $q->{question});
-            }
-        }
-        else {
-#warn("$$ run_xs_callback $data->{error} with no questions\n");
-            for my $host (@{$self->{hosts}}) {
-                next if exists $self->{results}{$host};
-                trace(2, "got $host => $data->{error}\n") if TRACE_LEVEL >= 2;
-                $self->{results}{$host} = $data->{error};
-                $self->{callback}->($data->{error}, $host);
-            }
-        }
-        return;
-    }
-
-    my $query = $data->{questions}[0]{question};
-    if ($data->{questions}[0]{type} eq 'PTR') {
-        $query =~ s/^(\d+)\.(\d+)\.(\d+)\.(\d+)\.in-addr\.arpa/$4.$3.$2.$1/;
-    }
-    for my $answer (@{$data->{answers}}) {
-        my $result;
-        if (my $param = $type_to_host{$answer->{type}}) {
-            $result = $answer->{$param};
-        }
-        elsif ($answer->{type} eq "MX") {
-            $result = [$answer->{exchange}, $answer->{preference}];
-        }
-        else {
-            die "Unimplemented query type: $answer->{type}";
-        }
-        $self->run_callback($result, $query, $answer->{ttl});
-    }
-    if (!$self->{results}{$query}) {
-        $self->{results}{$query} = 'NXDOMAIN';
-        trace(2, "got $query => NXDOMAIN\n") if TRACE_LEVEL >= 2;
-        $self->{callback}->("NXDOMAIN", $query);
-    }
-}
 
 sub DESTROY {
     my ParaDNS $self = shift;

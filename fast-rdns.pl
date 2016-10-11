@@ -61,9 +61,6 @@ sub main {
                     return 1 if $pob->pending;
                 }
             }
-            if (ParaDNS::XS_AVAILABLE) {
-                return 1 if ParaDNS::XS::num_queries();
-            }
             return 1 if @IPs;
             return 0;
         });
