@@ -17,6 +17,11 @@ matrix:
 before_install:
   - cpanm -n Devel::Cover::Report::Coveralls
   - eval $(curl https://travis-perl.github.io/init) --auto
+  - coverage-setup
+install:
+  - cpan-install --deps       # installs prereqs, including recommends
+  - cpan-install --coverage   # installs converage prereqs, if enabled
 script:
- -  perl Makefile.PL && make test  && cover -test -report coveralls
-
+  - prove -l -j$(test-jobs) $(test-files)   # parallel testing
+after_success:
+  - coverage-report
