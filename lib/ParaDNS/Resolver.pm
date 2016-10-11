@@ -4,6 +4,7 @@ use base qw(Danga::Socket);
 use fields qw(res dst queries);
 
 use Net::DNS;
+use Net::DNS::Packet;
 use Socket;
 use strict;
 
@@ -109,13 +110,14 @@ sub _query {
     
     $host = dnsext_dns0x20($host) unless NO_DNS0x20;
     
-    my $packet = $self->{res}->make_query_packet($host, $type);
+    my $packet = Net::DNS::Packet->new($host, $type);
+
     
     my $id = $packet->header->id;
     while ($self->{queries}->{$id}) {
         # ID already in use, try again :-(
         trace(2, "Query ID $id already in use. Trying another\n") if TRACE_LEVEL >= 2;
-        $packet = $self->{res}->make_query_packet($host, $type);
+        $packet = Net::DNS::Packet->new($host, $type);
         $id = $packet->header->id;
     }
     my $packet_data = $packet->data;
@@ -249,7 +251,8 @@ sub event_read {
                     # for an answer to the question we're just about to ask...
                     # (on the other hand, this works)
                     
-                    my $packet = $res->make_query_packet($host, $qobj->type);
+		    my $packet = Net::DNS::Packet->new($host, $qobj->type);
+
 
                     my $packet_data = $packet->data;
                     my $id = $packet->header->id;
