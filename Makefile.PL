@@ -4,6 +4,16 @@ use strict;
 
 use ExtUtils::MakeMaker qw(WriteMakefile);
 
+sub MY::postamble {
+	qq[testcover ::
+	\t cover -delete && \\
+	HARNESS_PERL_SWITCHES=-MDevel::Cover \$(MAKE) test && \\
+	cover -report text
+	]
+}
+
+
+
 WriteMakefile(
     VERSION_FROM   => 'lib/ParaDNS.pm',
     NAME           => 'ParaDNS',
