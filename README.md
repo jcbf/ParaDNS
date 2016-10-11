@@ -2,6 +2,7 @@ ParaDNS
 =======
 
 [![Build Status](https://travis-ci.org/jcbf/ParaDNS.svg?branch=master)](https://travis-ci.org/jcbf/ParaDNS)
+[![Coverage Status](https://coveralls.io/repos/github/jcbf/ParaDNS/badge.svg?branch=more_tests)](https://coveralls.io/github/jcbf/ParaDNS)
 
 Just got the abandoned lib anf fixed some bugs
 
