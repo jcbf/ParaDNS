@@ -32,7 +32,7 @@ my %RESOLVER;
 use constant TRACE_LEVEL => ($ENV{PARADNS_DEBUG} || 0);
 use constant INTERNAL_CACHE => !($ENV{PARADNS_NO_CACHE} || 0);
 
-use constant CACHE_CLEAN_INTERVAL => 60;
+use constant CACHE_CLEAN_INTERVAL => ($ENV{PARADNS_CACHE_CLEAN_INTERVAL} || 60);
 
 my %cache;
 my $cache_cleanup;
