@@ -16,6 +16,7 @@ matrix:
     - perl: blead
 before_install:
   - cpanm -n Devel::Cover::Report::Coveralls
+  - cpanm -n Net::DNS
   - eval $(curl https://travis-perl.github.io/init) --auto
   - coverage-setup
 install:
