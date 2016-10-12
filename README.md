@@ -1,10 +1,11 @@
 ParaDNS
 =======
 
-[![Build Status](https://travis-ci.org/jcbf/ParaDNS.svg?branch=master)](https://travis-ci.org/jcbf/ParaDNS)
-[![Coverage Status](https://coveralls.io/repos/github/jcbf/ParaDNS/badge.svg)](https://coveralls.io/github/jcbf/ParaDNS)
+Just got the abandoned lib and fixed some bugs.
 
-Just got the abandoned lib anf fixed some bugs
+  * Namerserver direct access 
+  * Better handle o NXDOMAIN
+  * Drop make_query_packet in favor of  Net::DNS::Packet->new
 
-Also added some tests and removed some trash code
+Also added some tests and removed some trash code ( ParaDNS::XS )
 
