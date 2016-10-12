@@ -21,6 +21,7 @@ before_install:
 install:
   - cpan-install --deps       # installs prereqs, including recommends
   - cpanm -n Net::DNS
+  - cpanm -n Danga::Socket
   - cpan-install --coverage   # installs converage prereqs, if enabled
 #script:
 #  - prove -l -j$(test-jobs) $(test-files)   # parallel testing
