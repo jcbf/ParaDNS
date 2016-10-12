@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use Test::More tests => 3;
+use Test::More tests => 2;
 
 $|++;
 
@@ -17,25 +17,13 @@ Danga::Socket->SetPostLoopCallback(
 
 my $got_answer = 0;
 ParaDNS->new(
-    host => 'www.google.com',
+    host => 'www.cpan.org',
     type => 'A',
-    nameservers => [qw/8.8.8.8/],
+    nameservers => [qw/8.8.8.8 8.8.4.4:53/],
     callback => sub {
         print "Got no answer: $_[0]\n";
-        return if $got_answer++;
+	return if $got_answer++;
 	ok($_[0], "www.google.com => $_[0]");
-        $done++;
-    },
-);
-my $ns_got_answer = 0;
-ParaDNS->new(
-    host => 'www.bing.com',
-    type => 'A',
-    nameservers => [qw/8.8.4.4:53/],
-    callback => sub {
-        print "Got no answer: $_[0]\n";
-        return if $ns_got_answer++;
-	ok($_[0], "www.bing.com => $_[0]");
         $done++;
     },
 );
