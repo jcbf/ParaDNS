@@ -7,6 +7,12 @@ $|++;
 $ENV{PARADNS_TIMEOUT}= 2;
 use_ok('ParaDNS');
 
+# Can't really make this test in Travis, so bypass
+if ($ENV{NO_NOERROR_TEST} ) {
+    ok('ParaDNS',"wont test NOERROR");
+    exit;
+}
+
 my $done = 0;
 
 Danga::Socket->SetPostLoopCallback(

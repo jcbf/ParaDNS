@@ -30,7 +30,7 @@ my $ns_got_answer = 0;
 ParaDNS->new(
     host => 'gmail.com',
     type => 'TXT',
-    nameservers => [qw/8.8.8.8 8.8.4.4:53/],
+    nameservers => [qw/8.8.4.4:53/],
     callback => sub {
         print "Got no answer: $_[0]\n";
         return if $ns_got_answer++;

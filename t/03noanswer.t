@@ -4,7 +4,7 @@ use Test::More tests => 2;
 
 $|++;
 
-$ENV{PARADNS_TIMEOUT}= 2;
+$ENV{PARADNS_TIMEOUT}= 1;
 use_ok('ParaDNS');
 
 my $done = 0;
