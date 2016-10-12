@@ -16,11 +16,11 @@ matrix:
     - perl: blead
 before_install:
   - cpanm -n Devel::Cover::Report::Coveralls
-  - cpanm -n Net::DNS
   - eval $(curl https://travis-perl.github.io/init) --auto
   - coverage-setup
 install:
   - cpan-install --deps       # installs prereqs, including recommends
+  - cpanm -n Net::DNS
   - cpan-install --coverage   # installs converage prereqs, if enabled
 #script:
 #  - prove -l -j$(test-jobs) $(test-files)   # parallel testing
